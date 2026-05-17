@@ -13,8 +13,10 @@ let sensors = {};
 let sseConnections = {};
 
 async function loadSensors() {
+    console.log('[Argus] Loading sensors...');
     const res = await fetch('/api/status');
     const data = await res.json();
+    console.log('[Argus] Sensor status:', data);
     const grid = document.getElementById('sensor-grid');
     grid.innerHTML = '';
 
@@ -34,8 +36,9 @@ async function loadSensors() {
             <div class="actions">
                 <button onclick="readSensor('${s.name}')">Read</button>
                 ${s.capabilities.includes('stream') ? `<button onclick="toggleStream('${s.name}')" id="stream-btn-${s.name}">Stream</button>` : ''}
-                ${s.capabilities.includes('capture') ? `<a href="/api/${s.name}/image" target="_blank">Image</a>` : ''}
-                ${s.capabilities.includes('capture') && s.name === 'audio' ? `<a href="/api/${s.name}/audio" target="_blank">Audio</a>` : ''}
+                ${s.capabilities.includes('capture') ? `<button onclick="showImage('${s.name}')">Image</button>` : ''}
+                ${s.capabilities.includes('capture') && s.name === 'audio' ? `<button onclick="showAudio('${s.name}')">Audio</button>` : ''}
+                ${s.capabilities.includes('capture') ? `<a class="raw-link" href="/api/${s.name}/image?t=${Date.now()}" target="_blank" title="Open raw image in new tab">raw</a>` : ''}
             </div>
             <div class="preview" id="preview-${s.name}"></div>
         `;
@@ -46,18 +49,26 @@ async function loadSensors() {
 }
 
 async function readSensor(name) {
+    console.log(`[Argus] readSensor('${name}')`);
     const preview = document.getElementById(`preview-${name}`);
     preview.style.display = 'block';
     preview.innerHTML = '<pre>Loading...</pre>';
 
     try {
-        const res = await fetch(`/api/${name}/read`);
+        const res = await fetch(`/api/${name}/read?t=${Date.now()}`);
+        console.log(`[Argus] /api/${name}/read status:`, res.status, res.statusText);
+        if (!res.ok) {
+            const errText = await res.text();
+            preview.innerHTML = `<pre style="color:var(--error)">HTTP ${res.status}: ${escapeHtml(errText)}</pre>`;
+            return;
+        }
         const data = await res.json();
+        console.log(`[Argus] /api/${name}/read payload keys:`, Object.keys(data));
         const payload = typeof data === 'string' ? JSON.parse(data) : data;
 
         let html = '';
         if (payload.error) {
-            html = `<pre style="color:var(--error)">Error: ${payload.error}</pre>`;
+            html = `<pre style="color:var(--error)">Error: ${escapeHtml(payload.error)}</pre>`;
         } else {
             if (payload.image_b64) {
                 html += `<img src="data:image/jpeg;base64,${payload.image_b64}" alt="${name}">`;
@@ -71,7 +82,55 @@ async function readSensor(name) {
         }
         preview.innerHTML = html;
     } catch (e) {
-        preview.innerHTML = `<pre style="color:var(--error)">Fetch error: ${e.message}</pre>`;
+        console.error(`[Argus] readSensor('${name}') error:`, e);
+        preview.innerHTML = `<pre style="color:var(--error)">Fetch error: ${escapeHtml(e.message)}</pre>`;
+    }
+}
+
+async function showImage(name) {
+    console.log(`[Argus] showImage('${name}')`);
+    const preview = document.getElementById(`preview-${name}`);
+    preview.style.display = 'block';
+    preview.innerHTML = '<pre>Loading image...</pre>';
+
+    try {
+        const res = await fetch(`/api/${name}/image?t=${Date.now()}`);
+        console.log(`[Argus] /api/${name}/image status:`, res.status, res.statusText);
+        if (!res.ok) {
+            const errText = await res.text();
+            preview.innerHTML = `<pre style="color:var(--error)">HTTP ${res.status}: ${escapeHtml(errText)}</pre>`;
+            return;
+        }
+        const blob = await res.blob();
+        console.log(`[Argus] /api/${name}/image blob size:`, blob.size, 'type:', blob.type);
+        const url = URL.createObjectURL(blob);
+        preview.innerHTML = `<img src="${url}" alt="${name}" style="width:100%;height:auto;display:block;"><pre>${blob.size} bytes, ${blob.type}</pre>`;
+    } catch (e) {
+        console.error(`[Argus] showImage('${name}') error:`, e);
+        preview.innerHTML = `<pre style="color:var(--error)">Image error: ${escapeHtml(e.message)}</pre>`;
+    }
+}
+
+async function showAudio(name) {
+    console.log(`[Argus] showAudio('${name}')`);
+    const preview = document.getElementById(`preview-${name}`);
+    preview.style.display = 'block';
+    preview.innerHTML = '<pre>Loading audio...</pre>';
+
+    try {
+        const res = await fetch(`/api/${name}/audio?t=${Date.now()}`);
+        console.log(`[Argus] /api/${name}/audio status:`, res.status, res.statusText);
+        if (!res.ok) {
+            const errText = await res.text();
+            preview.innerHTML = `<pre style="color:var(--error)">HTTP ${res.status}: ${escapeHtml(errText)}</pre>`;
+            return;
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        preview.innerHTML = `<audio controls src="${url}" style="width:100%"></audio><pre>${blob.size} bytes, ${blob.type}</pre>`;
+    } catch (e) {
+        console.error(`[Argus] showAudio('${name}') error:`, e);
+        preview.innerHTML = `<pre style="color:var(--error)">Audio error: ${escapeHtml(e.message)}</pre>`;
     }
 }
 

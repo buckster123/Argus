@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, StreamingResponse, Response, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -29,6 +30,15 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Argus Dashboard", version="0.1.0", lifespan=lifespan)
 
+# CORS — allow dashboard access from any origin (localhost, LAN IP, etc.)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Static files (dashboard UI)
 import os
 _static_dir = os.path.join(os.path.dirname(__file__), "static")
@@ -45,6 +55,18 @@ async def root():
     return "<h1>Argus Dashboard</h1><p>Static files not found.</p>"
 
 
+def _no_cache_json(content: dict, status_code: int = 200) -> JSONResponse:
+    return JSONResponse(
+        content=content,
+        status_code=status_code,
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
+
+
 @app.get("/api/status")
 async def api_status():
     reg = _registry
@@ -53,7 +75,7 @@ async def api_status():
     available = []
     for name, plugin in reg.all_plugins().items():
         available.append({"name": name, "capabilities": plugin.capabilities})
-    return {"available": available, "all": reg.list_all()}
+    return _no_cache_json({"available": available, "all": reg.list_all()})
 
 
 @app.get("/api/{sensor}/read")
@@ -62,7 +84,7 @@ async def api_read(sensor: str):
     if reg is None or sensor not in reg.all_plugins():
         raise HTTPException(status_code=404, detail=f"Sensor '{sensor}' not available")
     data = await reg.get(sensor).read()
-    return _sense_to_json(data)
+    return _no_cache_json(_sense_to_json(data))
 
 
 @app.get("/api/{sensor}/stream")
@@ -87,7 +109,15 @@ async def api_image(sensor: str):
         raise HTTPException(status_code=404, detail=f"Sensor '{sensor}' not available")
     data = await reg.get(sensor).read()
     if data.image:
-        return Response(content=data.image, media_type="image/jpeg")
+        return Response(
+            content=data.image,
+            media_type="image/jpeg",
+            headers={
+                "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            },
+        )
     if data.error:
         raise HTTPException(status_code=500, detail=data.error)
     raise HTTPException(status_code=400, detail="No image from this sensor")
@@ -100,7 +130,15 @@ async def api_audio(sensor: str):
         raise HTTPException(status_code=404, detail=f"Sensor '{sensor}' not available")
     data = await reg.get(sensor).read()
     if data.audio:
-        return Response(content=data.audio, media_type="audio/wav")
+        return Response(
+            content=data.audio,
+            media_type="audio/wav",
+            headers={
+                "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            },
+        )
     if data.error:
         raise HTTPException(status_code=500, detail=data.error)
     raise HTTPException(status_code=400, detail="No audio from this sensor")

@@ -123,8 +123,22 @@ main {
     transition: background 0.15s;
 }
 
+.actions a.raw-link {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    padding: 0.5rem 0.3rem;
+    font-size: 0.75rem;
+    text-decoration: underline;
+}
+
 .actions a:hover, .actions button:hover {
     background: rgba(102, 252, 241, 0.1);
+}
+
+.actions a.raw-link:hover {
+    background: transparent;
+    color: var(--heading);
 }
 
 .preview {
