@@ -20,19 +20,34 @@ It's senses. For your agent. On any laptop.
 
 ```
 Hermes / Claude / Any MCP Client
-        │
-        ▼
-    argus-mcp              ← MCP server, stdio transport
-        │
-        ▼
-    Argus Dashboard        ← FastAPI, port 8080
-        │
-   ┌────┼────────┬────────┐
-   ▼    ▼        ▼        ▼
-Webcam Audio   Screen   System
+        |
+        v
+    argus-mcp              <- MCP server, stdio transport
+        |
+        v
+    Argus Dashboard        <- FastAPI, port 8080
+        |
+   +----+----+--------+
+   v    v    v        v
+Webcam Audio Screen System
 ```
 
 The MCP server talks to the dashboard over localhost REST. The agent calls tools; tools call sensors; sensors return data. Simple, fast, composable.
+
+**Plugin architecture:**
+
+```
+PluginRegistry.discover()
+    |
+    +-- argus.senses.webcam    -> WebcamPlugin
+    +-- argus.senses.audio     -> AudioPlugin
+    +-- argus.senses.screen    -> ScreenPlugin
+    +-- argus.senses.system    -> SystemPlugin
+    +-- argus.senses.usb_thermal        (stub)
+    +-- argus.senses.usb_environmental  (stub)
+    +-- argus.senses.usb_gps            (stub)
+    +-- argus.senses.serial_coprocessor (stub)
+```
 
 ---
 
