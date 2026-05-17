@@ -40,7 +40,14 @@ dependencies = [
 [project.optional-dependencies]
 audio = ["sounddevice>=0.4.6", "wavio>=0.0.9"]
 thermal = ["adafruit-circuitpython-mlx90640 ; platform_machine=='aarch64'"]
-all = ["argus-senses[audio,thermal]"]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "httpx>=0.27.0",
+    "ruff>=0.4.0",
+]
+all = ["argus-senses[audio,thermal,dev]"]
 
 [project.scripts]
 argus-mcp = "argus.mcp_server:main"

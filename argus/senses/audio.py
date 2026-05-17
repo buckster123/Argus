@@ -14,6 +14,8 @@ try:
     import numpy as np
     _HAS_AUDIO = True
 except Exception:
+    sd = None
+    np = None
     _HAS_AUDIO = False
 
 
