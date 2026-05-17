@@ -1,0 +1,10 @@
+name: hermes-argus
+version: 0.1.0
+description: "Argus sensor dashboard for Hermes — laptop senses at a glance"
+author: buckster123
+kind: standalone
+provides_tools:
+  - argus_webcam_capture
+  - argus_screen_capture
+  - argus_system_read
+provides_hooks: []

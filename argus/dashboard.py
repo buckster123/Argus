@@ -38,43 +38,11 @@ if os.path.isdir(_static_dir):
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    return """<!DOCTYPE html>
-<html>
-<head>
-    <title>Argus Dashboard</title>
-    <style>
-        body { font-family: system-ui, sans-serif; background:#0b0c10; color:#c5c6c7; margin:0; padding:2rem; }
-        h1 { color:#66fcf1; }
-        .sensor { background:#1f2833; border-radius:8px; padding:1rem; margin:1rem 0; }
-        .sensor h2 { margin-top:0; color:#45a29e; }
-        .caps span { background:#0b0c10; padding:.2rem .6rem; border-radius:4px; margin-right:.4rem; font-size:.8rem; }
-        a { color:#66fcf1; }
-        pre { background:#0b0c10; padding:1rem; overflow:auto; }
-    </style>
-</head>
-<body>
-    <h1>Argus — Agent Senses</h1>
-    <div id="sensors">Loading...</div>
-    <script>
-        async function load() {
-            const r = await fetch('/api/status');
-            const j = await r.json();
-            const div = document.getElementById('sensors');
-            div.innerHTML = '';
-            for (const s of j.available) {
-                div.innerHTML += `<div class="sensor">
-                    <h2>${s.name}</h2>
-                    <div class="caps">${s.capabilities.map(c=>`<span>${c}</span>`).join('')}</div>
-                    <p><a href="/api/${s.name}/read">Read snapshot</a>
-                    ${s.capabilities.includes('stream') ? ` | <a href="/api/${s.name}/stream">SSE stream</a>` : ''}
-                    ${s.capabilities.includes('capture') ? ` | <a href="/api/${s.name}/image">Image</a>` : ''}</p>
-                </div>`;
-            }
-        }
-        load();
-    </script>
-</body>
-</html>"""
+    index_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
+    if os.path.exists(index_path):
+        with open(index_path) as f:
+            return f.read()
+    return "<h1>Argus Dashboard</h1><p>Static files not found.</p>"
 
 
 @app.get("/api/status")

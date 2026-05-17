@@ -1,0 +1,168 @@
+:root {
+    --bg: #0b0c10;
+    --surface: #1f2833;
+    --text: #c5c6c7;
+    --heading: #66fcf1;
+    --accent: #45a29e;
+    --border: #2a3b4c;
+    --success: #4caf50;
+    --error: #f44336;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+header {
+    padding: 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    color: var(--heading);
+    font-size: 2rem;
+    letter-spacing: 0.05em;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+}
+
+.status-dot.offline {
+    background: var(--error);
+    box-shadow: 0 0 8px var(--error);
+}
+
+main {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.sensor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.sensor-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.sensor-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.sensor-card h2 {
+    color: var(--accent);
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sensor-card .icon {
+    font-size: 1.5rem;
+}
+
+.capabilities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.cap {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.actions a, .actions button {
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    color: var(--heading);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.actions a:hover, .actions button:hover {
+    background: rgba(102, 252, 241, 0.1);
+}
+
+.preview {
+    margin-top: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    max-height: 240px;
+    background: var(--bg);
+    display: none;
+}
+
+.preview img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.preview pre {
+    padding: 1rem;
+    font-size: 0.8rem;
+    overflow: auto;
+    max-height: 200px;
+}
+
+footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--accent);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.streaming .status-dot {
+    animation: pulse 1.5s infinite;
+}
