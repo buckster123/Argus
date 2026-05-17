@@ -1,12 +1,21 @@
-# 👁️ Argus
+<p align="center">
+  <img src="banner.png" alt="Argus" width="700"/>
+</p>
 
-> **Physical senses for AI agents** — give your laptop eyes, ears, and awareness of itself. No extra hardware required.
+<h1 align="center">Argus</h1>
+<p align="center"><strong>Physical senses for AI agents on any laptop</strong></p>
+
+<p align="center">
+  <a href="https://github.com/buckster123/Argus/releases"><img src="https://img.shields.io/github/v/release/buckster123/Argus?style=flat-square" alt="Version"></a>
+  <a href="https://github.com/buckster123/Argus/actions"><img src="https://img.shields.io/github/actions/workflow/status/buckster123/Argus/ci.yml?style=flat-square" alt="CI"></a>
+  <a href="https://github.com/buckster123/Argus/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License"></a>
+</p>
 
 ---
 
-## What Is This?
+## What is Argus?
 
-AI agents are brilliant. But they're usually locked inside a terminal, blind to the world around them.
+AI agents are brilliant. But they are usually locked inside a terminal, blind to the world around them.
 
 **Argus fixes that.**
 
@@ -16,20 +25,59 @@ It's senses. For your agent. On any laptop.
 
 ---
 
+## Screenshot
+
+<p align="center">
+  <img src="docs/screenshot-dashboard.png" alt="Argus Dashboard" width="800"/>
+</p>
+
+---
+
+## Built-In Sensors
+
+| Sensor | What it does | Hardware required |
+|--------|-------------|-------------------|
+| 📹 **Webcam** | Capture photos, stream video | Any laptop webcam |
+| 🎤 **Audio** | Record microphone clips | Any laptop mic |
+| 🖥️ **Screen** | Screenshot the primary monitor | Any display |
+| 🧠 **System** | CPU, memory, disk, battery, temperature | None |
+
+All four work on any modern laptop with **zero configuration**.
+
+### Coming soon (stubs ready)
+
+| Sensor | Hardware | Price range |
+|--------|----------|-------------|
+| 🌡️ **USB Thermal** | FLIR Lepton, Seek Thermal | $50–200 |
+| 🌬️ **Environmental** | BME680/688, SCD4x, SPS30 | $20–40 |
+| 📍 **USB GPS** | u-blox NEO-6M/7M/8M | $15–25 |
+| ⚡ **Serial Co-processor** | ESP32/Arduino/RP2040 bridge | $10–30 |
+
+See [`docs/PLUGINS.md`](docs/PLUGINS.md) to build your own.
+
+---
+
 ## Architecture
 
 ```
-Hermes / Claude / Any MCP Client
-        |
-        v
-    argus-mcp              <- MCP server, stdio transport
-        |
-        v
-    Argus Dashboard        <- FastAPI, port 8080
-        |
-   +----+----+--------+
-   v    v    v        v
-Webcam Audio Screen System
+┌──────────────────────────────────────────┐
+│ Hermes / Claude / Any MCP Client │
+└──────────────────────────────────────────┘
+              │
+              ▼
+         argus-mcp
+       MCP server (stdio)
+              │
+              ▼
+    ┌──────────────────────────────┐
+    │  Argus Dashboard (FastAPI)  │
+    │         Port 8080            │
+    └──────────────────────────────┘
+              │
+     ┌───────├───────├────────┐
+     ▼     ▼     ▼        ▼
+  Webcam  Audio  Screen   System
+  (cv2) (sound) (mss)   (psutil)
 ```
 
 The MCP server talks to the dashboard over localhost REST. The agent calls tools; tools call sensors; sensors return data. Simple, fast, composable.
@@ -38,11 +86,11 @@ The MCP server talks to the dashboard over localhost REST. The agent calls tools
 
 ```
 PluginRegistry.discover()
-    |
-    +-- argus.senses.webcam    -> WebcamPlugin
-    +-- argus.senses.audio     -> AudioPlugin
-    +-- argus.senses.screen    -> ScreenPlugin
-    +-- argus.senses.system    -> SystemPlugin
+    │
+    +-- argus.senses.webcam    → WebcamPlugin
+    +-- argus.senses.audio     → AudioPlugin
+    +-- argus.senses.screen    → ScreenPlugin
+    +-- argus.senses.system    → SystemPlugin
     +-- argus.senses.usb_thermal        (stub)
     +-- argus.senses.usb_environmental  (stub)
     +-- argus.senses.usb_gps            (stub)
@@ -51,34 +99,17 @@ PluginRegistry.discover()
 
 ---
 
-## Built-In Sensors (Universal Tier)
-
-| Sense | What It Does | Library |
-|-------|--------------|---------|
-| 👁️ **Webcam** | Capture photos, stream video | OpenCV |
-| 🎤 **Audio** | Record microphone clips | sounddevice |
-| 🖥️ **Screen** | Screenshot the primary monitor | mss |
-| 🧠 **System** | CPU, memory, disk, battery, temperature | psutil |
-
-All four work on any modern laptop with zero configuration.
-
----
-
-## Quickstart
-
-### 1. Clone & Install
+## Quick Start
 
 ```bash
+# Clone & install
 git clone https://github.com/buckster123/Argus.git
 cd Argus
 python -m venv venv
 source venv/bin/activate
 pip install -e ".[audio]"
-```
 
-### 2. Start the Dashboard
-
-```bash
+# Start the dashboard
 argus-dashboard
 # or
 python -m argus
@@ -86,10 +117,9 @@ python -m argus
 
 Open http://localhost:8080 to see your available sensors.
 
-### 3. Connect to an MCP Client
+### Connect to an MCP client
 
-Add to your Hermes / Claude / MCP client config:
-
+**Claude Code:**
 ```json
 {
   "mcpServers": {
@@ -100,12 +130,38 @@ Add to your Hermes / Claude / MCP client config:
 }
 ```
 
+**Hermes:**
+```yaml
+mcpServers:
+  argus:
+    command: /path/to/Argus/venv/bin/argus-mcp
+```
+
 Then just ask:
 
-> *"What do you see right now?"*
-> *"Take a screenshot and describe it."*
-> *"How's my laptop doing?"*
+> *"What do you see right now?"*  
+> *"Take a screenshot and describe it."*  
+> *"How's my laptop doing?"*  
 > *"Record 5 seconds of audio."*
+
+---
+
+## Hermes Dashboard Plugin
+
+Argus ships with a native Hermes dashboard tab. After enabling the plugin:
+
+```bash
+ln -sfn ~/Projects/Argus/hermes-argus-plugin ~/.hermes/plugins/hermes-argus
+hermes plugins enable hermes-argus
+```
+
+The **Argus** tab appears in your Hermes dashboard with live sensor cards:
+
+<p align="center">
+  <img src="docs/screenshot-hermes-tab.png" alt="Hermes Argus Tab" width="700"/>
+</p>
+
+Click **READ** on any sensor to capture data directly inside the Hermes UI.
 
 ---
 
@@ -119,56 +175,74 @@ Then just ask:
 | `GET /api/{sensor}/image` | Direct JPEG (if sensor has image) |
 | `GET /api/{sensor}/audio` | Direct WAV (if sensor has audio) |
 
+See [`docs/API.md`](docs/API.md) for full reference.
+
 ---
 
-## Plugin Architecture
+## MCP Tools
 
-Argus is built around a simple plugin system. Every sensor implements:
+| Tool | Description |
+|------|-------------|
+| `argus_webcam_capture` | Capture a photo from the webcam |
+| `argus_screen_capture` | Screenshot the primary monitor |
+| `argus_audio_capture` | Record microphone audio |
+| `argus_system_read` | Read CPU, memory, disk, battery, temperature |
+
+Tools are dynamically registered — only sensors that pass `probe()` get exposed.
+
+See [`docs/MCP.md`](docs/MCP.md) for connection examples.
+
+---
+
+## Building a New Sensor
 
 ```python
-class SensePlugin(ABC):
-    name: str
-    capabilities: list[str]
+# argus/senses/my_sensor.py
+from argus.senses.base import SenseData, SensePlugin
 
-    async def probe(self) -> bool: ...
-    async def read(self) -> SenseData: ...
-    async def stream(self) -> AsyncIterator[SenseData]: ...
-    async def close(self): ...
+class MySensorPlugin(SensePlugin):
+    name = "my_sensor"
+    capabilities = ["capture"]
+
+    async def probe(self) -> bool:
+        return True
+
+    async def read(self) -> SenseData:
+        return SenseData(
+            sensor=self.name,
+            data={"value": 42},
+            text="Read 42 from my_sensor",
+        )
 ```
 
-Plugins auto-register. The scanner probes each one at startup and only exposes the sensors that are actually present.
+No registration needed — `PluginRegistry.discover()` finds it automatically.
 
-### Future Tiers
-
-| Tier | Examples | Status |
-|------|----------|--------|
-| **USB Thermal** | FLIR Lepton, Seek Thermal | Planned |
-| **USB Environmental** | BME680/688 via FT232H | Planned |
-| **USB GPS** | u-blox NEO | Planned |
-| **Serial Co-processor** | ESP32 "nose" from SensorHead | Planned |
-| **Bluetooth** | BLE temp/humidity sensors | Planned |
+For the full guide, see [`docs/PLUGINS.md`](docs/PLUGINS.md).
 
 ---
 
-## Project Structure
+## Testing
 
+```bash
+make test        # Full suite with coverage
+make test-fast   # Skip hardware/display tests
+make lint        # ruff check
 ```
-Argus/
-├── argus/
-│   ├── senses/
-│   │   ├── base.py      # Abstract plugin
-│   │   ├── webcam.py    # OpenCV camera
-│   │   ├── audio.py     # sounddevice mic
-│   │   ├── screen.py    # mss screenshot
-│   │   └── system.py    # psutil health
-│   ├── plugin_registry.py
-│   ├── mcp_server.py
-│   ├── dashboard.py
-│   └── config.py
-├── tests/
-├── pyproject.toml
-└── README.md
-```
+
+---
+
+## Roadmap
+
+- [x] Universal laptop sensors (webcam, audio, screen, system)
+- [x] MCP server with dynamic tool registration
+- [x] FastAPI dashboard with SSE streaming
+- [x] Hermes dashboard plugin
+- [x] Plugin architecture + contribution guide
+- [ ] USB thermal camera support
+- [ ] USB environmental sensor support
+- [ ] USB GPS support
+- [ ] ESP32 serial co-processor bridge
+- [ ] PyPI release
 
 ---
 
@@ -187,4 +261,6 @@ MIT — build weird things with it.
 
 ---
 
-*Part of the [ApexAurum](https://github.com/buckster123) ecosystem — AI agents that live in the physical world.*
+<p align="center">
+  <i>Part of the <a href="https://github.com/buckster123">ApexAurum</a> ecosystem — AI agents that live in the physical world.</i>
+</p>
