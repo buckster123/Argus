@@ -1,0 +1,35 @@
+[Argus] Loading sensors... app.js:16:13
+[Argus] Sensor status: 
+Object { available: (3) […], all: {…} }
+app.js:19:13
+[Argus] readSensor('webcam') app.js:52:13
+[Argus] /api/webcam/read status: 200 OK app.js:59:17
+[Argus] /api/webcam/read payload keys: 
+Array(6) [ "sensor", "timestamp", "data", "text", "error", "image_b64" ]
+app.js:66:17
+[Argus] showImage('webcam') app.js:91:13
+[Argus] /api/webcam/image status: 200 OK app.js:98:17
+[Argus] /api/webcam/image blob size: 6244 type: image/jpeg app.js:105:17
+[Argus] readSensor('webcam') app.js:52:13
+[Argus] /api/webcam/read status: 200 OK app.js:59:17
+[Argus] /api/webcam/read payload keys: 
+Array(6) [ "sensor", "timestamp", "data", "text", "error", "image_b64" ]
+app.js:66:17
+[Argus] readSensor('screen') app.js:52:13
+[Argus] /api/screen/read status: 200 OK app.js:59:17
+[Argus] /api/screen/read payload keys: 
+Array(6) [ "sensor", "timestamp", "data", "text", "error", "image_b64" ]
+app.js:66:17
+[Argus] showImage('screen') app.js:91:13
+[Argus] /api/screen/image status: 200 OK app.js:98:17
+[Argus] /api/screen/image blob size: 74987 type: image/jpeg app.js:105:17
+[Argus] showImage('webcam') app.js:91:13
+[Argus] /api/webcam/image status: 200 OK app.js:98:17
+[Argus] /api/webcam/image blob size: 6253 type: image/jpeg app.js:105:17
+[Argus] showImage('system') app.js:91:13
+[Argus] /api/system/image status: 400 Bad Request app.js:98:17
+[Argus] readSensor('system') app.js:52:13
+[Argus] /api/system/read status: 200 OK app.js:59:17
+[Argus] /api/system/read payload keys: 
+Array(5) [ "sensor", "timestamp", "data", "text", "error" ]
+app.js:66:17
