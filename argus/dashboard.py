@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse, StreamingResponse, Response
+from fastapi.responses import HTMLResponse, StreamingResponse, Response, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from argus.config import get_config
@@ -106,8 +106,7 @@ async def api_audio(sensor: str):
     raise HTTPException(status_code=400, detail="No audio from this sensor")
 
 
-def _sense_to_json(data: SenseData) -> str:
-    import json
+def _sense_to_json(data: SenseData) -> dict:
     payload = {
         "sensor": data.sensor,
         "timestamp": data.timestamp,
@@ -119,7 +118,7 @@ def _sense_to_json(data: SenseData) -> str:
         payload["image_b64"] = base64.b64encode(data.image).decode("utf-8")
     if data.audio:
         payload["audio_b64"] = base64.b64encode(data.audio).decode("utf-8")
-    return json.dumps(payload, default=str)
+    return payload
 
 
 def main() -> None:
