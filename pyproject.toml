@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "argus-senses"
+version = "0.1.0"
+description = "Physical senses for AI agents — webcam, audio, screen, and system health on any laptop"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Andre", email = "andre@apexaurum.dev"}
+]
+keywords = ["mcp", "ai", "sensors", "webcam", "audio", "screen-capture", "embodiment"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "pydantic>=2.0.0",
+    "pillow>=10.0.0",
+    "psutil>=5.9.0",
+    "numpy>=1.24.0",
+    "mcp>=1.0.0",
+    "opencv-python>=4.8.0",
+    "mss>=9.0.0",
+]
+
+[project.optional-dependencies]
+audio = ["sounddevice>=0.4.6", "wavio>=0.0.9"]
+thermal = ["adafruit-circuitpython-mlx90640 ; platform_machine=='aarch64'"]
+all = ["argus-senses[audio,thermal]"]
+
+[project.scripts]
+argus-mcp = "argus.mcp_server:main"
+argus-dashboard = "argus.dashboard:main"
+
+[project.urls]
+Homepage = "https://github.com/buckster123/Argus"
+Repository = "https://github.com/buckster123/Argus"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["argus*"]
+
+[tool.setuptools.package-data]
+argus = ["static/**/*", "templates/**/*"]
