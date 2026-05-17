@@ -5,11 +5,6 @@
 <h1 align="center">Argus</h1>
 <p align="center"><strong>Physical senses for AI agents on any laptop</strong></p>
 
-<p align="center">
-  <a href="https://github.com/buckster123/Argus/releases"><img src="https://img.shields.io/github/v/release/buckster123/Argus?style=flat-square" alt="Version"></a>
-  <a href="https://github.com/buckster123/Argus/actions"><img src="https://img.shields.io/github/actions/workflow/status/buckster123/Argus/ci.yml?style=flat-square" alt="CI"></a>
-  <a href="https://github.com/buckster123/Argus/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License"></a>
-</p>
 
 ---
 
